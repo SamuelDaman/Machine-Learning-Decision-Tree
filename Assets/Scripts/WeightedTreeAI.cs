@@ -51,15 +51,22 @@ public interface IDecision
 
 public class SeesPlayer : IDecision
 {
+
+    SeesPlayer() { }
+
     public IDecision MakeDecision()
     {
         // Check LoS then move to next node.
+
+
         return null;
     }
 }
 
 public class CheckDistance : IDecision
 {
+    CheckDistance() { }
+
     public IDecision MakeDecision()
     {
         // Check distance then move to next node.
@@ -69,6 +76,8 @@ public class CheckDistance : IDecision
 
 public class HasSeenPlayer : IDecision
 {
+    HasSeenPlayer() { }
+
     public IDecision MakeDecision()
     {
         // Check if prevPlayerPoint has been set and not reached then move to next node.
