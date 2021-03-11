@@ -7,23 +7,31 @@ public class WeightedTreeAI : MonoBehaviour
 {
     private NavMeshAgent agent;
     public Transform player;
-    public bool inSight;
+    //public bool inSight;
     public LayerMask lineMask;
-    public float distance;
+    //public float distance;
+    public float meleeRange = 3f;
     public Vector3 directionToPlayer;
     public Vector3 playerMoveDirection;
     public Vector3 prevPlayerPoint;
+
+    public IDecision seesPlayer;
+    public IDecision isInMeleeRange;
+    public IDecision hasSeenPlayer;
 
     // Start is called before the first frame update
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        seesPlayer = new SeesPlayer(this);
+        isInMeleeRange = new IsInMeleeRange(this);
+        hasSeenPlayer = new HasSeenPlayer(this);
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        
+        seesPlayer.MakeDecision();
     }
 
     public bool LineOfSightCheck()
@@ -42,6 +50,21 @@ public class WeightedTreeAI : MonoBehaviour
             return false;
         }
     }
+
+    public bool DistanceCheck()
+    {
+        return Vector3.Distance(transform.position, player.position) <= meleeRange;
+    }
+
+    public void Melee()
+    {
+        // Initiate a melee attack.
+    }
+
+    public void Shoot()
+    {
+        // Shoot at the player.
+    }
 }
 
 public interface IDecision
@@ -51,32 +74,55 @@ public interface IDecision
 
 public class SeesPlayer : IDecision
 {
+    public WeightedTreeAI parentScript;
+    public SeesPlayer() { }
 
-    SeesPlayer() { }
+    public SeesPlayer(WeightedTreeAI script)
+    {
+        parentScript = script;
+    }
 
     public IDecision MakeDecision()
     {
         // Check LoS then move to next node.
-
-
-        return null;
+        return parentScript.LineOfSightCheck() ? parentScript.isInMeleeRange.MakeDecision() : parentScript.hasSeenPlayer.MakeDecision();
     }
 }
 
-public class CheckDistance : IDecision
+public class IsInMeleeRange : IDecision
 {
-    CheckDistance() { }
+    WeightedTreeAI parentScript;
+    public IsInMeleeRange() { }
+
+    public IsInMeleeRange(WeightedTreeAI script)
+    {
+        parentScript = script;
+    }
 
     public IDecision MakeDecision()
     {
         // Check distance then move to next node.
+        if (parentScript.DistanceCheck())
+        {
+            parentScript.Melee();
+        }
+        else
+        {
+            parentScript.Shoot();
+        }
         return null;
     }
 }
 
 public class HasSeenPlayer : IDecision
 {
-    HasSeenPlayer() { }
+    WeightedTreeAI parentScipt;
+    public HasSeenPlayer() { }
+
+    public HasSeenPlayer(WeightedTreeAI script)
+    {
+        parentScipt = script;
+    }
 
     public IDecision MakeDecision()
     {
