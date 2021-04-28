@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour
 
         float delta = Time.deltaTime;
         Vector3 input = transform.TransformDirection(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
-        Vector3.SmoothDamp(move, input * speed, ref move, speed / acceleration, speed, delta);
+        Vector3.SmoothDamp(move, input * speed, ref move, speed / acceleration, speed * delta, delta);
         if (input == Vector3.zero && move.magnitude < 0.01f)
         {
             move = Vector3.zero;
